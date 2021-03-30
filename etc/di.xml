@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright © Websolute spa. All rights reserved.
+  ~ See LICENSE and/or COPYING.txt for license details.
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Logger start -->
+    <type name="Websolute\TransporterCleaner\Cron\Cleaner">
+        <arguments>
+            <argument name="logger" xsi:type="object">Websolute\TransporterCleaner\Logger\Virtual</argument>
+        </arguments>
+    </type>
+    <virtualType name="Websolute\TransporterCleaner\Logger\Virtual" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">Websolute::TransporterCleaner</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Websolute\TransporterCleaner\Handler\Virtual</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Websolute\TransporterCleaner\Handler\Virtual"
+                 type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/transporter-cleaner-cron.log</argument>
+        </arguments>
+    </virtualType>
+    <!-- Logger end -->
+
+    <!-- Command start -->
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="transporter_clean" xsi:type="object">Websolute\TransporterCleaner\Console\Command\CleanCommand</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Websolute\TransporterCleaner\Console\Command\CleanCommand">
+        <arguments>
+            <argument name="name" xsi:type="string">transporter:clean</argument>
+        </arguments>
+    </type>
+    <!-- Command end -->
+
+    <!-- Cron start -->
+    <type name="Websolute\TransporterCron\Api\CronListInterface">
+        <arguments>
+            <argument name="list" xsi:type="array">
+                <item name="transporter_cleaner_all" xsi:type="object">Websolute\TransporterCleaner\Cron\All\Virtual</item>
+                <item name="transporter_cleaner_completed" xsi:type="object">Websolute\TransporterCleaner\Cron\Completed\Virtual</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Websolute\TransporterCleaner\Cron\All\Virtual"
+                 type="Websolute\TransporterCron\Model\TransporterCron">
+        <arguments>
+            <argument name="config" xsi:type="object">Websolute\TransporterCleaner\Model\ConfigCleanAll</argument>
+            <argument name="instanceName" xsi:type="string">Websolute\TransporterCleaner\Cron\Cleaner\All\Virtual</argument>
+            <argument name="code" xsi:type="string">transporter_cleaner_all</argument>
+            <argument name="name" xsi:type="string">transporter_cleaner_all</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Websolute\TransporterCleaner\Cron\Completed\Virtual"
+                 type="Websolute\TransporterCron\Model\TransporterCron">
+        <arguments>
+            <argument name="config" xsi:type="object">Websolute\TransporterCleaner\Model\ConfigCleanCompleted</argument>
+            <argument name="instanceName" xsi:type="string">Websolute\TransporterCleaner\Cron\Cleaner\Completed\Virtual</argument>
+            <argument name="code" xsi:type="string">transporter_cleaner_completed</argument>
+            <argument name="name" xsi:type="string">transporter_cleaner_completed</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Websolute\TransporterCleaner\Cron\Cleaner\All\Virtual"
+                 type="Websolute\TransporterCleaner\Cron\CleanAll">
+        <arguments>
+            <argument name="logger" xsi:type="object">Websolute\TransporterCleaner\Logger\Virtual</argument>
+            <argument name="config" xsi:type="object">Websolute\TransporterCleaner\Model\ConfigCleanAll</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Websolute\TransporterCleaner\Cron\Cleaner\Completed\Virtual"
+                 type="Websolute\TransporterCleaner\Cron\CleanCompleted">
+        <arguments>
+            <argument name="logger" xsi:type="object">Websolute\TransporterCleaner\Logger\Virtual</argument>
+            <argument name="config" xsi:type="object">Websolute\TransporterCleaner\Model\ConfigCleanCompleted</argument>
+        </arguments>
+    </virtualType>
+    <!-- Cron end -->
+</config>
